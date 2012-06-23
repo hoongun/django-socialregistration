@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.utils import importlib
 from django.utils.translation import ugettext_lazy as _
@@ -58,8 +59,11 @@ class CommonMixin(TemplateResponseMixin):
         """
         Return an inactive message.
         """
-        return self.render_to_response({
-            'error': _("This user account is marked as inactive.")})
+        inactive_url = getattr(settings, 'LOGIN_INACTIVE_REDIRECT_URL', reverse('socialregistration:setup'))
+        if inactive_url:
+            return HttpResponseRedirect(inactive_url)
+        else:
+            return self.render_to_response({'error': _("This user account is marked as inactive.")})
 
     def redirect(self, request):
         """
@@ -113,7 +117,7 @@ class ProfileMixin(object):
         """
         Create and return an empty user model.
         """
-        return User()
+        return User(is_active=False)
 
     def create_profile(self, user, save=False, **kwargs):
         """

@@ -275,9 +275,6 @@ class SetupCallback(SocialRegistration, View):
         # No user existing - create a new one and redirect to the final setup view
         if user is None:
             user = self.create_user()
-            user.is_active = False
-            user.save()
-
             profile = self.create_profile(user, **lookup_kwargs)
             
             self.store_user(request, user)
@@ -288,8 +285,7 @@ class SetupCallback(SocialRegistration, View):
 
         # Inactive user - displaying an error message.
         if not user.is_active:
-            return HttpResponseRedirect(reverse('socialregistration:setup'))
-            #return self.inactive_response()
+            return self.inactive_response()
         
         # Active user with existing profile: login, send signal and redirect
         self.login(request, user)
