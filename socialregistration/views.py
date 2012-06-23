@@ -250,7 +250,10 @@ class SetupCallback(SocialRegistration, View):
           form or generate a username automatically
         """
         
-        client = request.session[self.get_client().get_session_key()]
+        try:
+            client = request.session[self.get_client().get_session_key()]
+        except KeyError:
+            return self.render_to_response({'error': "Session expired."})
         
         # Get the lookup dictionary to find the user's profile
         lookup_kwargs = self.get_lookup_kwargs(request, client)
@@ -283,7 +286,7 @@ class SetupCallback(SocialRegistration, View):
             
             return HttpResponseRedirect(reverse('socialregistration:setup'))
 
-        # Inactive user - displaying an error message.
+        # Inactive user - displaying / redirect to the appropriate place.
         if not user.is_active:
             return self.inactive_response()
         
