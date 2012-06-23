@@ -8,6 +8,7 @@ from socialregistration.contrib.linkedin.models import LinkedInProfile
 from socialregistration.contrib.openid.models import OpenIDProfile
 from socialregistration.contrib.tumblr.models import TumblrProfile
 from socialregistration.contrib.twitter.models import TwitterProfile
+from socialregistration.contrib.vkontakte.models import VkontakteProfile
 
 def index(request):
     return render_to_response(
@@ -19,4 +20,5 @@ def index(request):
             github=GithubProfile.objects.all(),
             foursquare=FoursquareProfile.objects.all(),
             tumblr=TumblrProfile.objects.all(),
+            vkontakte=VkontakteProfile.objects.all(),
     ), context_instance=RequestContext(request))

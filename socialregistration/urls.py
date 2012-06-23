@@ -39,6 +39,11 @@ if 'socialregistration.contrib.tumblr' in settings.INSTALLED_APPS:
         url(r'^tumblr/', include('socialregistration.contrib.tumblr.urls',
             namespace='tumblr')))
 
+if 'socialregistration.contrib.vkontakte' in settings.INSTALLED_APPS:
+    urlpatterns = urlpatterns + patterns('',
+        url(r'^vkontakte/', include('socialregistration.contrib.vkontakte.urls',
+            namespace='vkontakte')))
+
 urlpatterns = urlpatterns + patterns('',
     url(r'^setup/$', Setup.as_view(), name='setup'),
     url(r'^logout/$', Logout.as_view(), name='logout'),

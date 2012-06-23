@@ -18,6 +18,9 @@ FORM_CLASS = getattr(settings, 'SOCIALREGISTRATION_SETUP_FORM',
 INITAL_DATA_FUNCTION = getattr(settings, 'SOCIALREGISTRATION_INITIAL_DATA_FUNCTION',
     None)
 
+MERGE_USERS_FUNCTION = getattr(settings, 'SOCIALREGISTRATION_MERGE_USERS_FUNCTION',
+    None)
+
 
 class Setup(SocialRegistration, View):
     """
@@ -123,6 +126,8 @@ class Setup(SocialRegistration, View):
         user, profile = form.save(request, user, profile, client)
         
         user = profile.authenticate()
+        user.is_active = True
+        user.save()
         
         self.send_connect_signal(request, user, profile, client)
         
@@ -220,6 +225,15 @@ class SetupCallback(SocialRegistration, View):
     """
     Base class for OAuth and OAuth2 login / connects / registration.
     """
+
+    def find_collisions(self, new_user, **lookup_kwargs):
+        old_user = self.authenticate(**lookup_kwargs)
+        if old_user:
+            merged_networks = self.merge_profiles(new_user, old_user)
+            if MERGE_USERS_FUNCTION:
+                MERGE_USERS_FUNCTION(new_user, old_user, merged_networks)
+            old_user.delete()
+
     
     def get(self, request):
         """
@@ -243,6 +257,7 @@ class SetupCallback(SocialRegistration, View):
 
         # Logged in user connecting an account
         if request.user.is_authenticated():
+            self.find_collisions(request.user, **lookup_kwargs)
             profile, created = self.get_or_create_profile(request.user,
                 save=True, **lookup_kwargs)
 
@@ -260,6 +275,9 @@ class SetupCallback(SocialRegistration, View):
         # No user existing - create a new one and redirect to the final setup view
         if user is None:
             user = self.create_user()
+            user.is_active = False
+            user.save()
+
             profile = self.create_profile(user, **lookup_kwargs)
             
             self.store_user(request, user)
@@ -270,7 +288,8 @@ class SetupCallback(SocialRegistration, View):
 
         # Inactive user - displaying an error message.
         if not user.is_active:
-            return self.inactive_response()
+            return HttpResponseRedirect(reverse('socialregistration:setup'))
+            #return self.inactive_response()
         
         # Active user with existing profile: login, send signal and redirect
         self.login(request, user)

@@ -8,6 +8,7 @@ from django.views.generic.base import TemplateResponseMixin
 
 from socialregistration import signals
 from socialregistration.settings import SESSION_KEY
+from socialregistration.settings import PROFILES
 
 
 class CommonMixin(TemplateResponseMixin):
@@ -150,6 +151,34 @@ class ProfileMixin(object):
         except self.get_model().DoesNotExist:
             profile = self.create_profile(user, save=save, **kwargs)
             return profile, True
+
+    def get_profile_classes(self):
+        profile_classes = {}
+        for middleware in getattr(settings, 'MIDDLEWARE_CLASSES', []):
+            splited = middleware.split('.')
+            app_name = splited[0]
+            network = splited[2]
+             
+            if app_name == 'socialregistration':
+                profile_class = __import__('socialregistration.contrib.%s.models' % network, fromlist=[PROFILES[network]])
+                profile_classes[network] = profile_class
+        return profile_classes
+
+    def merge_profiles(self, new_user, old_user):
+        merged_networks = []
+        for network, profile_class in self.get_profile_classes.items():
+            try:
+                profile = profile_class.objects.get(user=old_user)
+            except profile_class.DoesNotExist:
+                continue
+
+            profile.user = new_user
+            profile.save()
+            
+            merged_networks.append(network)
+        return merged_networks
+
+
 
 class SessionMixin(object):
     """
