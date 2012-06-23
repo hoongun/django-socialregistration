@@ -11,3 +11,4 @@ PROFILES = {
     'twitter': 'TwitterProfile',
     'vkontakte': 'VkontakteProfile',
 }
+GET_FIRST_RECIEVED_USER = True
