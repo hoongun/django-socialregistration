@@ -9,7 +9,7 @@ class VkontakteMiddleware(SocialMiddleware):
     
     def get_uid(self):
         try:
-            return VkontakteProfile.objects.get(user=self.user).uid
+            return VkontakteProfile.objects.get(user=self.user).vk_uid
         except VkontakteProfile.DoesNotExist:
             return ''
     

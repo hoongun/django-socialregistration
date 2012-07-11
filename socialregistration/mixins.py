@@ -170,7 +170,7 @@ class ProfileMixin(object):
 
     def merge_profiles(self, new_user, old_user):
         merged_networks = []
-        for network, profile_class in self.get_profile_classes.items():
+        for network, profile_class in self.get_profile_classes().items():
             try:
                 profile = profile_class.objects.get(user=old_user)
             except profile_class.DoesNotExist:

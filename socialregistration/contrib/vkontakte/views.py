@@ -20,4 +20,4 @@ class VkontakteSetup(SetupCallback):
     template_name = 'socialregistration/vkontakte/vkontakte.html'
     
     def get_lookup_kwargs(self, request, client):
-        return {'uid': client.get_user_info()['uid']}
+        return {'vk_uid': client.get_user_info()['uid']}

@@ -8,16 +8,16 @@ from socialregistration.signals import connect, login
 class VkontakteProfile(models.Model):
     user = models.ForeignKey(User, unique=True)
     site = models.ForeignKey(Site, default=Site.objects.get_current)
-    uid = models.CharField(max_length=255, blank=False, null=False)
+    vk_uid = models.CharField(max_length=255, blank=False, null=False)
 
     def __unicode__(self):
         try:
-            return u'%s: %s' % (self.user, self.uid)
+            return u'%s: %s' % (self.user, self.vk_uid)
         except User.DoesNotExist:
             return u'None'
 
     def authenticate(self):
-        return authenticate(uid=self.uid)
+        return authenticate(vk_uid=self.vk_uid)
     
 class VkontakteAccessToken(models.Model):
     profile = models.OneToOneField(VkontakteProfile, related_name='access_token')

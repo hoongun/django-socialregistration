@@ -8,9 +8,9 @@ class VkontakteAuth(ModelBackend):
     supports_object_permissions = False
     supports_anonymous_user = False
 
-    def authenticate(self, uid = None):
+    def authenticate(self, vk_uid = None):
         site = Site.objects.get_current()
-        profiles = VkontakteProfile.objects.filter(uid=uid, site=site)
+        profiles = VkontakteProfile.objects.filter(vk_uid=vk_uid, site=site)
         count = profiles.count()
         if count == 0:
             return None
