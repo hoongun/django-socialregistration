@@ -228,7 +228,10 @@ class SetupCallback(SocialRegistration, View):
 
     def find_collisions(self, new_user, **lookup_kwargs):
         old_user = self.authenticate(**lookup_kwargs)
-        if old_user:
+        if old_user != new_user:
+            # We find a user with same social profile.
+            # We need to reconnect him profiles to new user 
+            # and delete old user.
             merged_networks = self.merge_profiles(new_user, old_user)
             if MERGE_USERS_FUNCTION:
                 MERGE_USERS_FUNCTION(new_user, old_user, merged_networks)
