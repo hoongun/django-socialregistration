@@ -233,8 +233,7 @@ class SetupCallback(SocialRegistration, View):
             # We need to reconnect him profiles to new user 
             # and delete old user.
             merged_networks = self.merge_profiles(new_user, old_user)
-            if MERGE_USERS_FUNCTION:
-                MERGE_USERS_FUNCTION(new_user, old_user, merged_networks)
+            MERGE_USERS_FUNCTION(new_user, old_user, merged_networks)
             old_user.delete()
 
     
@@ -263,7 +262,8 @@ class SetupCallback(SocialRegistration, View):
 
         # Logged in user connecting an account
         if request.user.is_authenticated():
-            self.find_collisions(request.user, **lookup_kwargs)
+            if MERGE_USERS_FUNCTION:
+                self.find_collisions(request.user, **lookup_kwargs)
             profile, created = self.get_or_create_profile(request.user,
                 save=True, **lookup_kwargs)
 
