@@ -1,3 +1,5 @@
+import warnings
+
 from django.conf import settings
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.sites.models import Site
