@@ -162,7 +162,8 @@ class ProfileMixin(object):
         new_user = request.user
         old_user = self.authenticate(**lookup_kwargs)
         if old_user != new_user and MERGE_USERS_FUNCTION:
-            return MERGE_USERS_FUNCTION(request, new_user, old_user)
+            func = self.import_attribute(MERGE_USERS_FUNCTION)
+            return func(request, new_user, old_user)
         return True
 
 class SessionMixin(object):
