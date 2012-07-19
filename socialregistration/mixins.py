@@ -161,7 +161,7 @@ class ProfileMixin(object):
     def correct_collisions(self, request, **lookup_kwargs):
         new_user = request.user
         old_user = self.authenticate(**lookup_kwargs)
-        if old_user != new_user and MERGE_USERS_FUNCTION:
+        if old_user and old_user != new_user and MERGE_USERS_FUNCTION:
             func = self.import_attribute(MERGE_USERS_FUNCTION)
             return func(request, new_user, old_user)
         return True
