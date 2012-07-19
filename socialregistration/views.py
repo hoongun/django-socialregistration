@@ -18,9 +18,6 @@ FORM_CLASS = getattr(settings, 'SOCIALREGISTRATION_SETUP_FORM',
 INITAL_DATA_FUNCTION = getattr(settings, 'SOCIALREGISTRATION_INITIAL_DATA_FUNCTION',
     None)
 
-MERGE_USERS_FUNCTION = getattr(settings, 'SOCIALREGISTRATION_MERGE_USERS_FUNCTION',
-    None)
-
 
 class Setup(SocialRegistration, View):
     """
@@ -225,17 +222,6 @@ class SetupCallback(SocialRegistration, View):
     """
     Base class for OAuth and OAuth2 login / connects / registration.
     """
-
-    def find_collisions(self, new_user, **lookup_kwargs):
-        old_user = self.authenticate(**lookup_kwargs)
-        if old_user != new_user:
-            # We find a user with same social profile.
-            # We need to reconnect him profiles to new user 
-            # and delete old user.
-            merged_networks = self.merge_profiles(new_user, old_user)
-            MERGE_USERS_FUNCTION(new_user, old_user, merged_networks)
-            old_user.delete()
-
     
     def get(self, request):
         """
@@ -262,8 +248,9 @@ class SetupCallback(SocialRegistration, View):
 
         # Logged in user connecting an account
         if request.user.is_authenticated():
-            if MERGE_USERS_FUNCTION:
-                self.find_collisions(request.user, **lookup_kwargs)
+            if not self.correct_collisions(request, **lookup_kwargs):
+                return self.redirect(request)
+            
             profile, created = self.get_or_create_profile(request.user,
                 save=True, **lookup_kwargs)
 
