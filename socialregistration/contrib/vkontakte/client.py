@@ -12,6 +12,7 @@ class Vkontakte(OAuth2):
     client_id = getattr(settings, 'VKONTAKTE_APP_ID', '')
     secret = getattr(settings, 'VKONTAKTE_SECRET_KEY', '')
     scope = getattr(settings, 'VKONTAKTE_REQUEST_PERMISSIONS', '')
+    display = getattr(settings, 'VKONTAKTE_DISPLAY', '')
     
     auth_url = 'http://oauth.vk.com/authorize'
     access_token_url = 'https://oauth.vk.com/access_token'
@@ -42,6 +43,8 @@ class Vkontakte(OAuth2):
             'client_secret': self.secret,
             'redirect_uri': self.get_callback_url(),
         })
+        if self.display:
+            params['display'] = self.display
         
         resp, content = self.request_access_token(params=params)
         print 'Response content ', resp, content 
