@@ -62,7 +62,7 @@ class Vkontakte(OAuth2):
 
         return content
 
-    def get_callback_url(self):
+    def get_callback_url(self, **kwargs):
         if self.is_https():
             return 'https://%s%s' % (Site.objects.get_current().domain,
                 reverse('socialregistration:vkontakte:callback'))
